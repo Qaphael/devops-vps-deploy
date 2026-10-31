@@ -1,0 +1,41 @@
+{
+  "skill_name": "devops-vps-deploy",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I have a Next.js app with Postgres and Docker Compose. I want to deploy it to my VPS with GitHub Actions, but first inspect the repo and server and give me a concrete plan. Don't change anything yet. The server has several existing sites.",
+      "expected_output": "A read-only inventory and staged plan that identifies shared-resource risk, CI and artifact strategy, host/DNS/proxy/TLS checks, secrets, migrations, verification, backups, and unknowns without making changes.",
+      "files": [],
+      "expectations": [
+        "Honors the request to inspect and plan only, with no mutations or deployment.",
+        "Explicitly inventories other sites and shared containers, networks, volumes, databases, and proxy configuration before proposing changes.",
+        "Recommends building an immutable artifact in CI and deploying that exact artifact rather than rebuilding on the VPS.",
+        "Includes secret handling, migration safety, HTTPS/live smoke checks, and backup/restore verification."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Our GitHub deploy passed CI, then SSH disconnected after several minutes while Docker was exporting the image on the VPS. Should I just rerun it? Diagnose the situation and give me the safe next steps.",
+      "expected_output": "Explains that a disconnect does not establish whether the remote deployment completed, instructs checking remote process/container/release state before retry, suggests connection keepalives as a reliability aid, and recommends moving to CI-built immutable images with health verification.",
+      "files": [],
+      "expectations": [
+        "Does not assume the remote command stopped or that deployment succeeded; checks remote state before retry.",
+        "Treats retries as potentially duplicative and recommends an idempotent deployment process.",
+        "Mentions SSH keepalive and timeout settings as mitigation, not as the fundamental artifact strategy.",
+        "Requires checking health/logs and the active release identity after deployment."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Remove the old app for old.example.com from my VPS. It may share a Postgres container and Docker network with another site. Give me the removal plan and proceed with anything safe.",
+      "expected_output": "Inspects ownership and dependency mapping first, distinguishes app-owned from shared resources, backs up or confirms retention requirements, and limits any authorized removal to clearly app-owned components while preserving the shared database/network and checking neighboring sites.",
+      "files": [],
+      "expectations": [
+        "Maps the target hostname to proxy route, compose project, containers, volumes, database/schema, mounts, and networks before deletion.",
+        "Preserves shared database and network unless independently proven app-owned and authorized for deletion.",
+        "Avoids broad prune or recursive deletion and identifies the exact resources to remove.",
+        "Verifies neighboring applications remain healthy after any removal and reports retained/deleted data."
+      ]
+    }
+  ]
+}
